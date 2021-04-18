@@ -4,7 +4,7 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 
-namespace ExpenseManager.Web.Controllers
+namespace ExpenseManager.API.Controllers
 {
     public class HomeController : Controller
     {

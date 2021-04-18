@@ -1,0 +1,65 @@
+﻿
+@{
+    ViewBag.Title = "Create";
+}
+<div class="container">
+    <h2>Add Expense</h2>
+    <form id="ExpenseForm">
+        <div class="form-group">
+            <label for="expensename">Expense Name:</label>
+            <input type="text" class="form-control" id="ExpenseName" placeholder="Enter Expense Name" name="ExpenseName">
+        </div>
+
+        <div class="form-group">
+            <label for="amount">Amount :</label>
+            <input type="number" class="form-control" id="Amount" placeholder="Enter Expense Amount" name="Amount">
+        </div>
+        <div class="form-group">
+            <label for="Description">Description :</label>
+            <input type="text" class="form-control" id="Description" placeholder="Enter Description" name="Description">
+        </div>
+
+        <div class="form-group">
+            <label for="expensedate">ExpenseDate:</label>
+            <input type="date" class="form-control" id="ExpenseDate" placeholder="Enter Expense Date" name="ExpenseDate">
+        </div>
+        <button type="submit" class="btn btn-primary">Add</button>
+    </form>
+</div>
+
+@section Scripts
+{
+    <script type="text/javascript">
+        $(function () {
+            $("#ExpenseForm").submit(function (e) {
+                e.preventDefault();
+                var ExpenseName = $("#ExpenseName").val();
+                var Amount = $("#Amount").val();
+                var Description = $("#Description").val();
+                var ExpenseDate = $("#ExpenseDate").val();
+
+                var expense = {
+                    Name: ExpenseName,
+                    Amount: Amount,
+                    Description: Description,
+                    ExpenseDate: ExpenseDate
+                };
+                console.log(expense);
+                $.ajax({
+                    url: '@Url.Action("Insert", "ExpenseReport")',
+                    type: "POST",
+                    data: JSON.stringify(expense),
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    success: function (response) {
+                        console.log(response);
+                    },
+                    error: function (err) {
+                        console.log(err);
+                    }
+                });
+            });
+        });
+    </script>
+}
+
