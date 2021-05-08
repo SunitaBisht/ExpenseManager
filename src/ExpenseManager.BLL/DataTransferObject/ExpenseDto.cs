@@ -2,20 +2,19 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
-using System.Web;
+using System.Text;
+using System.Threading.Tasks;
 
-namespace ExpenseManager.API.Models
+namespace ExpenseManager.BLL.DataTransferObject
 {
-    public class ExpenseViewModel
+    public class ExpenseDto
     {
-        public int Id { get; set; }
-
         [Required]
         public string Name { get; set; }
 
         [Required]
         public decimal Amount { get; set; }
-        [Required]
+
         public string Description { get; set; }
 
         [Required]

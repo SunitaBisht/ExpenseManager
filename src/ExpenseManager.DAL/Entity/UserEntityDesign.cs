@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ExpenseManager.DAL
+namespace ExpenseManager.DAL.Entity
 {
-    public class Class1
+    class UserEntityDesign
     {
     }
 }

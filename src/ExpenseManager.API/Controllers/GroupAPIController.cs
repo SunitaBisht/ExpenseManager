@@ -88,7 +88,76 @@ namespace ExpenseManager.API.Controllers
             int affectedRows = xsqlcommand.ExecuteNonQuery();
             sqlconnection.Close();
 
-            return Ok(affectedRows);
+            ApiResponse resobj = new ApiResponse();
+            resobj.Message = "Group Created successfully.";
+            resobj.Result = affectedRows.ToString();
+            resobj.Servertime = DateTime.Now;
+
+            return Ok(resobj);
         }
+
+        [Route("Update")]
+        [HttpPut]
+        public IHttpActionResult UpdateExpense(int id, ExpenseViewModel expense)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            string cmdText = "Update TblExpense set Name=@name,Amount=@amount,Description=@description,ExpenseDate=expensedate Where id=@id";
+            SqlCommand xsqlcommand = new SqlCommand(cmdText, sqlconnection);
+
+            xsqlcommand.Parameters.AddWithValue("@id", id);
+            xsqlcommand.Parameters.AddWithValue("@name", expense.Name);
+            xsqlcommand.Parameters.AddWithValue("@amount", expense.Amount);
+            xsqlcommand.Parameters.AddWithValue("@description", expense.Description);
+            xsqlcommand.Parameters.AddWithValue("@expensedate", expense.ExpenseDate);
+
+            sqlconnection.Open();
+            int affectedRows = xsqlcommand.ExecuteNonQuery();
+            sqlconnection.Close();
+
+            ApiResponse resobj = new ApiResponse();
+            resobj.Message = "Group Updated successfully.";
+            resobj.Result = affectedRows.ToString();
+            resobj.Servertime = DateTime.Now;
+
+            return Ok(resobj);
+        }
+
+        [Route("Delete")]
+        [HttpDelete]
+        public IHttpActionResult DeleteExpense(int id)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            string cmdText = "Delete from TblExpense where id=@id";
+            SqlCommand xsqlcommand = new SqlCommand(cmdText, sqlconnection);
+
+            xsqlcommand.Parameters.AddWithValue("@id", id);
+
+            sqlconnection.Open();
+            int affectedRows = xsqlcommand.ExecuteNonQuery();
+            sqlconnection.Close();
+
+            ApiResponse resobj = new ApiResponse();
+            resobj.Message = "Group Deleted successfully.";
+            resobj.Result = affectedRows.ToString();
+            resobj.Servertime = DateTime.Now;
+
+            return Ok(resobj);
+        }
+    }
+
+    public class ApiResponse
+    {
+        public string Message { get; set; }
+        public string Result { get; set; }
+        public DateTime Servertime { get; set; }
+        public string Apiversion { get; set; }
     }
 }

@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ExpenseManager.BLL
+namespace ExpenseManager.DAL.Entity
 {
-    public class Class1
+    class GroupEntityDesign
     {
     }
 }
