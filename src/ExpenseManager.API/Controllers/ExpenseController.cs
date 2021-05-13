@@ -31,5 +31,22 @@ namespace ExpenseManager.API.Controllers
             int isAdded = await _expenseService.SaveExpense(expenseRequest);
             return Ok(isAdded);
         }
+
+        [HttpGet]
+        [Route("getAll")]
+        public async Task<IHttpActionResult> GetAllExpense()
+        {
+            IEnumerable<ExpenseDto> results = await _expenseService.GetAllExpenses();
+            return Ok(results);
+            // IEnumerable<ExpenseDto> result = await _expenseService.GetAllExpenses();
+          
+            //if (result == null)
+            //{
+            //    return BadRequest(ModelState);
+            //}
+            //return Ok(result);
+        }
+
+       
     }
 }
