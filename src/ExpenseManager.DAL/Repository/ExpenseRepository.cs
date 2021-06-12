@@ -62,11 +62,6 @@ namespace ExpenseManager.DAL.Repository
             return expenseList;
         }
 
-        public Task<ExpenseEntityDesign> GetExpenseById()
-        {
-            throw new NotImplementedException();
-        }
-
         public async Task<ExpenseEntityDesign> GetExpenseById(int Id)
         {
             ExpenseEntityDesign entity = null;
