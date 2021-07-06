@@ -39,11 +39,11 @@ namespace ExpenseManager.BLL
         public async Task<IEnumerable<ExpenseDto>> GetAllExpenses()
         {
             List<ExpenseDto> expenses = new List<ExpenseDto>();
-            IEnumerable<ExpenseEntityDesign> result=  await _expenseRepository.GetAllExpense();
+            IEnumerable<ExpenseEntityDesign> result = await _expenseRepository.GetAllExpense();
             foreach (ExpenseEntityDesign item in result)
             {
                 ExpenseDto expense = new ExpenseDto();
-                expense.Name=item.Name;
+                expense.Name = item.Name;
                 expense.Amount = item.Amount;
                 expense.Description = item.Description;
                 expense.ExpenseDate = item.ExpenseDate;
@@ -53,25 +53,57 @@ namespace ExpenseManager.BLL
             return expenses;
         }
 
-        public async Task<ExpenseDto> GetCategoryById(int Id)
+        public async Task<ExpenseDto> GetExpenseById(int Id)
         {
-            throw new NotImplementedException();
+            if (Id == default)
+                throw new ArgumentException($"{Id} is not a vaild identifier.");
+
+            ExpenseEntityDesign expenseEntity = await _expenseRepository.GetExpenseById(Id);
+
+            ExpenseDto expense = new ExpenseDto();
+
+            if (expenseEntity.Name == null && expenseEntity.Amount == 0)
+            {
+                throw new Exception("Invalid Id");
+            }
+
+            expense.Name = expenseEntity.Name;
+            expense.Amount = expenseEntity.Amount;
+            expense.Description = expenseEntity.Description;
+            expense.ExpenseDate = expenseEntity.ExpenseDate;
+
+            return expense;
         }
 
-        //public async Task<int> UpdateExpense(ExpenseDto expense)
-        //{
-        //    ExpenseEntityDesign entity = await _expenseRepository.UpdateExpense(expense.Id);
+        public async Task<int> UpdateExpense(EditExpenseDto expense)
+        {
+            //if (expense is null)
+            //{
+            //    throw new Exception("Expense Required.");
+            //}
 
-        //    //Category xCategory = await _categoryRepository.GetCategoryById(category.Id);
+            ExpenseEntityDesign expenseEntity = await _expenseRepository.GetExpenseById(expense.Id);
 
-        //    //if (xCategory == null)
-        //    //    throw new UserFriendlyException($"{category.Id} is not valid {typeof(Category)} identifier.");
+            if (expense.Name == null && expense.Amount == 0)
+            {
+                throw new Exception("Invalid Id");
+            }
 
-        //    //xCategory.Name = category.Name;
-        //    //xCategory.Description = category.Description;
-        //    //xCategory.IsActive = true;
+            expenseEntity.Name = expense.Name;
+            expenseEntity.Amount = expense.Amount;
+            expenseEntity.Description = expense.Description;
+            expenseEntity.ExpenseDate = expense.ExpenseDate;
 
-        //    //return await _categoryRepository.UpdateCategory(xCategory);
-        //}
+            return await _expenseRepository.UpdateExpense(expenseEntity);
+        }
+
+        public async Task<bool> DeleteExpenseById(int Id, bool isHardDelete)
+        {
+            if (Id == default)
+                throw new ArgumentException($"{Id} is no a valid identifier.");
+
+            bool response = await _expenseRepository.RemoveExpense(Id, isHardDelete);
+            return response;
+        }
     }
 }

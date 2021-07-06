@@ -54,8 +54,15 @@ namespace ExpenseManager.DAL.Repository
                 expense.Amount = Convert.ToDecimal(dataRow["Amount"]);
                 expense.Description = dataRow["Description"].ToString();
                 expense.ExpenseDate = Convert.ToDateTime(dataRow["ExpenseDate"]);
-                expense.CreatedOn = Convert.ToDateTime(dataRow["CreatedOn"]);
-                expense.LastUpdatedOn = Convert.ToDateTime(dataRow["LastUpdatedOn"]);
+                if (dataRow["CreatedOn"] != DBNull.Value)
+                {
+                    expense.CreatedOn = Convert.ToDateTime(dataRow["CreatedOn"]);
+                }
+                if (dataRow["LastUpdatedOn"] != DBNull.Value)
+                {
+                    expense.LastUpdatedOn = Convert.ToDateTime(dataRow["LastUpdatedOn"]);
+                }
+                // expense.LastUpdatedOn = (DateTime?)(dataRow["LastUpdatedOn"] ?? DBNull.Value);
 
                 expenseList.Add(expense);
             }
@@ -76,6 +83,7 @@ namespace ExpenseManager.DAL.Repository
 
             await xSqlConnection.OpenAsync();
             SqlDataReader xSqlDataReader = await xsqlcommand.ExecuteReaderAsync();
+
             while (xSqlDataReader.HasRows && await xSqlDataReader.ReadAsync())
             {
                 entity = new ExpenseEntityDesign
@@ -86,41 +94,99 @@ namespace ExpenseManager.DAL.Repository
                     Description = xSqlDataReader["Description"].ToString(),
                     ExpenseDate = Convert.ToDateTime(xSqlDataReader["ExpenseDate"]),
                     CreatedOn = Convert.ToDateTime(xSqlDataReader["CreatedOn"]),
-                    // LastUpdatedOn = Convert.ToDateTime(xSqlDataReader["LastUpdatedOn"])
-
                 };
                 if (xSqlDataReader["LastUpdatedOn"] != DBNull.Value)
                 {
                     entity.LastUpdatedOn = Convert.ToDateTime(xSqlDataReader["LastUpdatedOn"]);
                 }
             }
+            xSqlConnection.Close();
             return entity;
         }
 
 
         public async Task<int> UpdateExpense(ExpenseEntityDesign xExpense)
         {
+            int isUpdated = 0;
             if (xExpense == null)
             {
                 throw new ArgumentNullException("No Expense Available");
             }
 
-            string cmdText = "UPDATE TblExpense SET Name= @name,Amount=@amount, Description= @description,ExpenseDate=@expensedate,IsDeleted=@isdeleted, LastUpdatedOn = @lastupdatedon WHERE Id =@Id";
-            SqlCommand xsqlcommand = new SqlCommand(cmdText, xSqlConnection);
-            xsqlcommand = new SqlCommand(cmdText, xSqlConnection);
+            try
+            {
+                string cmdText = "UPDATE TblExpense SET Name= @name,Amount=@amount, Description= @description,ExpenseDate=@expensedate,IsDeleted=@isdeleted,LastUpdatedOn=@lastupdatedon WHERE Id =@Id";
+                SqlCommand xsqlcommand = new SqlCommand(cmdText, xSqlConnection);
+                xsqlcommand = new SqlCommand(cmdText, xSqlConnection);
 
-            xsqlcommand.Parameters.AddWithValue("@Id", xExpense.Id);
-            xsqlcommand.Parameters.AddWithValue("@name", xExpense.Name);
-            xsqlcommand.Parameters.AddWithValue("@amount", xExpense.Amount);
-            xsqlcommand.Parameters.AddWithValue("@description", xExpense.Description);
-            xsqlcommand.Parameters.AddWithValue("@expensedate", xExpense.ExpenseDate);
-            xsqlcommand.Parameters.AddWithValue("@isdeleted", false);
-            xsqlcommand.Parameters.AddWithValue("@lastupdatedon", xExpense.LastUpdatedOn);
+                xsqlcommand.Parameters.AddWithValue("@Id", xExpense.Id);
+                xsqlcommand.Parameters.AddWithValue("@name", xExpense.Name);
+                xsqlcommand.Parameters.AddWithValue("@amount", xExpense.Amount);
+                xsqlcommand.Parameters.AddWithValue("@description", xExpense.Description);
+                xsqlcommand.Parameters.AddWithValue("@expensedate", xExpense.ExpenseDate);
+                xsqlcommand.Parameters.AddWithValue("@isdeleted", false);
+                xsqlcommand.Parameters.AddWithValue("@lastupdatedon", DateTime.Now);
 
-            await xSqlConnection.OpenAsync();
-            int isUpdated = await xsqlcommand.ExecuteNonQueryAsync();
-            xSqlConnection.Close();
+                await xSqlConnection.OpenAsync();
+                isUpdated = await xsqlcommand.ExecuteNonQueryAsync();
+                xSqlConnection.Close();
+
+            }
+            catch (Exception e)
+            {
+
+            }
             return isUpdated;
         }
+
+
+        public async Task<bool> RemoveExpense(int id, bool isHardDelete)
+        {
+            bool status = false;
+            if (id == 0)
+                throw new ArgumentNullException();
+
+            try
+            {
+                if (isHardDelete == true)
+                {
+                    string cmdText = "DELETE FROM TblExpense WHERE Id=@Id";
+                    SqlCommand xsqlcommand = new SqlCommand(cmdText, xSqlConnection);
+                    xsqlcommand = new SqlCommand(cmdText, xSqlConnection);
+
+                    xsqlcommand.Parameters.AddWithValue("@Id", id);
+                    await xSqlConnection.OpenAsync();
+                    var isDeleted = await xsqlcommand.ExecuteNonQueryAsync();
+
+                    if (isDeleted > 0)
+                    {
+                        status = true;
+                    }
+                }
+                else
+                {
+                    string cmdText = "UPDATE TblExpense Set IsDeleted=1,LastUpdatedOn = @lastupdatedon WHERE Id=@Id";
+                    SqlCommand xsqlcommand = new SqlCommand(cmdText, xSqlConnection);
+                    xsqlcommand = new SqlCommand(cmdText, xSqlConnection);
+
+                    xsqlcommand.Parameters.AddWithValue("@Id", id);
+                    xsqlcommand.Parameters.AddWithValue("@lastupdatedon", DateTime.Now);
+
+                    await xSqlConnection.OpenAsync();
+                    var isDeletedstatus = await xsqlcommand.ExecuteNonQueryAsync();
+                    if (isDeletedstatus > 0)
+                    {
+                        status = true;
+                    }
+                }
+                return status;
+
+            }
+            catch (Exception xException)
+            {
+                throw xException;
+            }
+        }
+
     }
 }

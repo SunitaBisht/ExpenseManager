@@ -42,6 +42,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DataTransferObject\EditExpenseDto.cs" />
     <Compile Include="DataTransferObject\ExpenseDto.cs" />
     <Compile Include="ExpenseService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
